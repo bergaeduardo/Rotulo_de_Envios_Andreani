@@ -2,7 +2,7 @@
 """
 Created on Mon Jun  1 11:44:50 2020
 
-@author: eduardo.berga
+@author: Berga Eduardo
 """
 
 
