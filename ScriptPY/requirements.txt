@@ -1,0 +1,4 @@
+selenium
+openpyxl
+pywin32
+autoit

@@ -1,0 +1,84 @@
+2025-03-27 13:48:08,054 - INFO - logger_config - Logging configurado al nivel: INFO
+2025-03-27 13:48:08,055 - INFO - logger_config - Guardando logs en: logs/andreani_automation.log
+2025-03-27 13:48:08,055 - INFO - main - Inicio del script Imprimir_Etiquetas_Andreani.py
+2025-03-27 13:48:08,056 - INFO - main - 1. Estableciendo impresora de etiquetas...
+2025-03-27 13:48:08,057 - INFO - printer_manager - Impresora predeterminada actual obtenida: '\\XL-FPS\IMP-ADMIN'
+2025-03-27 13:48:08,059 - INFO - printer_manager - Impresora predeterminada establecida a: '\\XL-FPS\IMP-ADMIN'
+2025-03-27 13:48:08,062 - INFO - main - Impresora de etiquetas establecida: \\XL-FPS\IMP-ADMIN
+2025-03-27 13:48:08,064 - INFO - main - 2. Normalizando datos en Excel...
+2025-03-27 13:48:08,257 - INFO - excel_manager - Libro de trabajo Excel cargado: 'C:\Users\eduardo.berga\Desktop\Proyectos\Rotulo_de_Envios_Andreani\ScriptPY\Documents\ImportacionMasivaEncomiendaDomicilio.xlsx'
+2025-03-27 13:48:08,308 - INFO - main - Datos normalizados y guardados en: C:\Users\eduardo.berga\Desktop\Proyectos\Rotulo_de_Envios_Andreani\ScriptPY\Documents\ImportacionMasiva_Pruebas.xlsx
+2025-03-27 13:48:08,308 - INFO - main - 3. Calculando cantidad de archivos a procesar...
+2025-03-27 13:48:08,346 - INFO - excel_manager - Libro de trabajo Excel cargado: 'C:\Users\eduardo.berga\Desktop\Proyectos\Rotulo_de_Envios_Andreani\ScriptPY\Documents\ImportacionMasiva_Pruebas.xlsx'
+2025-03-27 13:48:08,347 - INFO - main - Se procesarán 20 registros en 1 archivos.
+2025-03-27 13:48:08,347 - INFO - main - 4. Iniciando automática de impresión de etiquetas...
+2025-03-27 13:48:15,654 - INFO - andreani_automation - Navegador Chrome iniciado exitosamente.
+2025-03-27 13:48:15,663 - INFO - main - Iniciar el navegador...
+2025-03-27 13:48:34,825 - INFO - andreani_automation - Inicio de sesión en Andreani exitoso.
+2025-03-27 13:48:34,828 - INFO - main - Iniciar sesión en Andreani...
+2025-03-27 13:48:34,829 - INFO - main - Procesando archivo 1 de 1...
+2025-03-27 13:48:34,967 - INFO - excel_manager - Plantilla Excel 'C:\Users\eduardo.berga\Desktop\Proyectos\Rotulo_de_Envios_Andreani\ScriptPY\Documents\ImportacionAndreani.xlsx' limpiada.
+2025-03-27 13:48:35,023 - INFO - excel_manager - Libro de trabajo Excel cargado: 'C:\Users\eduardo.berga\Desktop\Proyectos\Rotulo_de_Envios_Andreani\ScriptPY\Documents\ImportacionAndreani.xlsx'
+2025-03-27 13:48:35,067 - INFO - excel_manager - Libro de trabajo Excel cargado: 'C:\Users\eduardo.berga\Desktop\Proyectos\Rotulo_de_Envios_Andreani\ScriptPY\Documents\ImportacionMasiva_Pruebas.xlsx'
+2025-03-27 13:48:41,086 - INFO - excel_manager - Archivo Excel guardado en formato .xlsx: 'C:\Users\eduardo.berga\Desktop\Proyectos\Rotulo_de_Envios_Andreani\ScriptPY\Documents\ImportacionAndreani.xlsx'
+2025-03-27 13:49:06,326 - INFO - andreani_automation - Navegación a página de carga masiva completada.
+2025-03-27 13:49:21,618 - INFO - andreani_automation - Archivo Excel 'C:\Users\eduardo.berga\Desktop\Proyectos\Rotulo_de_Envios_Andreani\ScriptPY\Documents\ImportacionAndreani.xlsx' cargado exitosamente.
+2025-03-27 13:49:44,279 - ERROR - andreani_automation - Error al confirmar la carga masiva: Message: invalid session id: session deleted as the browser has closed the connection
+from disconnected: not connected to DevTools
+  (Session info: chrome=134.0.6998.166)
+Stacktrace:
+	GetHandleVerifier [0x00007FF6CF2C4C25+3179557]
+	(No symbol) [0x00007FF6CEF288A0]
+	(No symbol) [0x00007FF6CEDB91CA]
+	(No symbol) [0x00007FF6CEDA4F85]
+	(No symbol) [0x00007FF6CEDC9F94]
+	(No symbol) [0x00007FF6CEE3F9DF]
+	(No symbol) [0x00007FF6CEE5FBE2]
+	(No symbol) [0x00007FF6CEE37A03]
+	(No symbol) [0x00007FF6CEE006D0]
+	(No symbol) [0x00007FF6CEE01983]
+	GetHandleVerifier [0x00007FF6CF3267CD+3579853]
+	GetHandleVerifier [0x00007FF6CF33D1D2+3672530]
+	GetHandleVerifier [0x00007FF6CF332153+3627347]
+	GetHandleVerifier [0x00007FF6CF09092A+868650]
+	(No symbol) [0x00007FF6CEF32FFF]
+	(No symbol) [0x00007FF6CEF2F4A4]
+	(No symbol) [0x00007FF6CEF2F646]
+	(No symbol) [0x00007FF6CEF1EAA9]
+	BaseThreadInitThunk [0x00007FFBEFEF7374+20]
+	RtlUserThreadStart [0x00007FFBF12BCC91+33]
+
+2025-03-27 13:49:44,298 - CRITICAL - main - Error principal durante la ejecución del script: Message: invalid session id: session deleted as the browser has closed the connection
+from disconnected: not connected to DevTools
+  (Session info: chrome=134.0.6998.166)
+Stacktrace:
+	GetHandleVerifier [0x00007FF6CF2C4C25+3179557]
+	(No symbol) [0x00007FF6CEF288A0]
+	(No symbol) [0x00007FF6CEDB91CA]
+	(No symbol) [0x00007FF6CEDA4F85]
+	(No symbol) [0x00007FF6CEDC9F94]
+	(No symbol) [0x00007FF6CEE3F9DF]
+	(No symbol) [0x00007FF6CEE5FBE2]
+	(No symbol) [0x00007FF6CEE37A03]
+	(No symbol) [0x00007FF6CEE006D0]
+	(No symbol) [0x00007FF6CEE01983]
+	GetHandleVerifier [0x00007FF6CF3267CD+3579853]
+	GetHandleVerifier [0x00007FF6CF33D1D2+3672530]
+	GetHandleVerifier [0x00007FF6CF332153+3627347]
+	GetHandleVerifier [0x00007FF6CF09092A+868650]
+	(No symbol) [0x00007FF6CEF32FFF]
+	(No symbol) [0x00007FF6CEF2F4A4]
+	(No symbol) [0x00007FF6CEF2F646]
+	(No symbol) [0x00007FF6CEF1EAA9]
+	BaseThreadInitThunk [0x00007FFBEFEF7374+20]
+	RtlUserThreadStart [0x00007FFBF12BCC91+33]
+
+2025-03-27 13:49:44,308 - INFO - main - 6. Finalización y limpieza...
+2025-03-27 13:49:46,547 - INFO - andreani_automation - Navegador cerrado.
+2025-03-27 13:49:46,547 - INFO - main - 7.Reestableciendo impresora predeterminada...
+2025-03-27 13:49:46,549 - INFO - printer_manager - Impresora predeterminada establecida a: '\\XL-FPS\IMP-ADMIN'
+2025-03-27 13:49:46,549 - INFO - main - (info)Impresora predeterminada reestablecida: \\XL-FPS\IMP-ADMIN
+2025-03-27 13:49:46,549 - INFO - main - >>>>>>>>>>>>>>>><<<<<<<<<<<<<<<
+2025-03-27 13:49:46,549 - INFO - main - >>>>  El proceso finalizo  <<<<
+2025-03-27 13:49:46,551 - INFO - main - >>>>>>>>>>>>>>>><<<<<<<<<<<<<<<
+2025-03-27 13:49:46,551 - INFO - main - Tiempo total de ejecución: 98.49 segundos
