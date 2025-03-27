@@ -5,6 +5,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import time
 import logging
 import autoit  # Manteniendo la dependencia de autoit
+import json
+from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
 
@@ -211,8 +213,36 @@ class AndreaniAutomator:
             raise
 
     def print_labels_for_operation(self, operation_number):
-        """Imprime las etiquetas para un número de operación."""
         try:
+            # Web scraping para extraer datos de la tabla e imprimir en JSON
+            html_content = self.browser.page_source
+            soup = BeautifulSoup(html_content, 'html.parser')
+            table = soup.find('table', class_='table table-striped table-hover grilla-envios grilla-generica')
+
+            if table is None:
+                logger.error("No se encontró la tabla en la página.")
+                return
+
+            headers = [th.text.strip() for th in table.find('thead').find_all('th')][1:]  # Ignora la primera columna de checkbox
+            data = []
+            for row in table.find('tbody').find_all('tr'):
+                row_data = [td.text.strip() for td in row.find_all('td')][1:]  # Ignora la primera columna de checkbox
+                if row_data:  # Asegurarse de que la fila no esté vacía
+                    data.append(dict(zip(headers, row_data)))
+
+            if not data:
+                logger.error("No se encontraron datos en la tabla.")
+                return
+
+            try:
+                with open('tabla_envios.json', 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=4)
+                logger.info("Datos de la tabla guardados en 'tabla_envios.json'")
+                print("Datos de la tabla guardados en 'tabla_envios.json'")  # Mensaje para la consola
+            except Exception as json_error:
+                logger.error(f"Error al escribir el archivo JSON: {json_error}")
+                print(f"Error al escribir el archivo JSON: {json_error}")  # Mensaje para la consola
+
             # Presiona el check seleccionar todos
             self.browser.execute_script("window.scrollBy(0,-4000)")  # Desplazamiento de la pagina hacia arriba
             search_textinput = self.browser.find_element(By.XPATH,
@@ -224,18 +254,18 @@ class AndreaniAutomator:
             search_textinput.click()
             time.sleep(10)
             # Guardar el valor de la nueva ventana
-            ventana_nueva = self.browser.window_handles[1] # Asumiendo que la nueva ventana es la segunda
+            ventana_nueva = self.browser.window_handles[1]  # Asumiendo que la nueva ventana es la segunda
             ventana_actual = self.browser.window_handles[0]
             time.sleep(5)
             self.browser.switch_to.window(ventana_nueva)
             time.sleep(5)
-            autoit.send("^p") #  Mantenemos autoit para simular la impresión
+            autoit.send("^p")  # Mantenemos autoit para simular la impresión
             time.sleep(15)
             autoit.send("{ENTER}")
-            print(f'Se imprimió la operacion {operation_number}') #  print para mostrar en la consola de WebContainer
+            print(f'Se imprimió la operacion {operation_number}')  # print para mostrar en la consola de WebContainer
             logger.info(f"Impresión de etiquetas para la operación '{operation_number}' simulada con AutoIt.")
             time.sleep(15)
-            self.browser.switch_to.window(ventana_actual) # Volver a la ventana principal
+            self.browser.switch_to.window(ventana_actual)
 
         except Exception as e:
             logger.error(f"Error al imprimir etiquetas para la operación '{operation_number}': {e}")
@@ -254,12 +284,12 @@ if __name__ == '__main__':
     try:
         automator.start_browser()
         automator.login_andreani()
-        # automator.navigate_to_massive_upload() #  Comentar para probar solo la parte de impresión
+        # automator.navigate_to_massive_upload() #  Comentar para probar solo la parte de carga masiva
         # excel_template_path = config['Excel']['template_file_path'] # Asegúrate de que esta ruta sea correcta para pruebas
-        # automator.upload_excel_file(excel_template_path) # Comentar para probar solo la parte de impresión
-        # automator.confirm_massive_upload() #  Comentar para probar solo la parte de impresión
-        # operation_numbers = automator.extract_operation_numbers() # Comentar para probar solo la parte de impresión
-        operation_numbers = ['1234567'] #  Para pruebas de impresión, usar un número de operación conocido
+        # automator.upload_excel_file(excel_template_path) # Comentar para probar solo la parte de carga masiva
+        # automator.confirm_massive_upload() #  Comentar para probar solo la parte de carga masiva
+        # operation_numbers = automator.extract_operation_numbers() # Comentar para probar solo la parte de carga masiva
+        operation_numbers = ['19048590'] #  Para pruebas de impresión, usar un número de operación conocido
         if operation_numbers:
             for op_num in operation_numbers:
                 automator.navigate_to_envio_management()
