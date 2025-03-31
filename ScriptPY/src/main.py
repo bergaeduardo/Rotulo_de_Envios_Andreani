@@ -212,6 +212,14 @@ def main():
         else:
             logger.warning('No se pudo reestablecer la impresora predeterminada porque no se obtuvo al inicio.')
 
+        # 7. Grabando Numero de envio en base de datos SQL Server
+        try:
+            logger.info("7. Grabando Numero de envio en base de datos SQL Server...")
+            andreani_automator.import_json_to_sql_server()
+        except Exception as e:
+            logger.error(f"Error al importar datos a SQL Server: {e}")
+        print("Proceso de importación a SQL Server finalizado.")
+
 
         t_1 = time.time()
         t_total = t_1 - t_0

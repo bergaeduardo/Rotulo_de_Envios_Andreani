@@ -7,13 +7,17 @@ import logging
 import autoit  # Manteniendo la dependencia de autoit
 import json
 from bs4 import BeautifulSoup
+import pyodbc
+import os
 
+CORE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 logger = logging.getLogger(__name__)
 
 class AndreaniAutomator:
     def __init__(self, config):
         self.config = config
         self.browser = None # Inicializar browser como None
+        self.core_dir = CORE_DIR
 
     def start_browser(self):
         """Inicia el navegador Chrome con las opciones configuradas."""
@@ -213,6 +217,7 @@ class AndreaniAutomator:
             raise
 
     def print_labels_for_operation(self, operation_number):
+        path_docJson = self.core_dir + '/Documents/tabla_envios.json'
         try:
             # Web scraping para extraer datos de la tabla e imprimir en JSON
             html_content = self.browser.page_source
@@ -223,7 +228,8 @@ class AndreaniAutomator:
                 logger.error("No se encontró la tabla en la página.")
                 return
 
-            headers = [th.text.strip() for th in table.find('thead').find_all('th')][1:]  # Ignora la primera columna de checkbox
+            # Agregar corchetes a los nombres de las columnas
+            headers = [f"[{th.text.strip()}]" for th in table.find('thead').find_all('th')][1:]  # Ignora la primera columna de checkbox
             data = []
             for row in table.find('tbody').find_all('tr'):
                 row_data = [td.text.strip() for td in row.find_all('td')][1:]  # Ignora la primera columna de checkbox
@@ -235,7 +241,8 @@ class AndreaniAutomator:
                 return
 
             try:
-                with open('tabla_envios.json', 'w', encoding='utf-8') as f:
+                # Guardar los datos con los nombres de columnas entre corchetes
+                with open(path_docJson, 'w+', encoding='utf-8') as f:
                     json.dump(data, f, ensure_ascii=False, indent=4)
                 logger.info("Datos de la tabla guardados en 'tabla_envios.json'")
                 print("Datos de la tabla guardados en 'tabla_envios.json'")  # Mensaje para la consola
@@ -261,7 +268,8 @@ class AndreaniAutomator:
             time.sleep(5)
             autoit.send("^p")  # Mantenemos autoit para simular la impresión
             time.sleep(15)
-            autoit.send("{ENTER}")
+            # autoit.send("{ENTER}")
+            autoit.send("{ESC}")
             print(f'Se imprimió la operacion {operation_number}')  # print para mostrar en la consola de WebContainer
             logger.info(f"Impresión de etiquetas para la operación '{operation_number}' simulada con AutoIt.")
             time.sleep(15)
@@ -271,16 +279,132 @@ class AndreaniAutomator:
             logger.error(f"Error al imprimir etiquetas para la operación '{operation_number}': {e}")
             raise
 
+    def import_json_to_sql_server(self):
+        """Importa datos desde tabla_envios.json a SQL Server."""
+        # json_file_path = 'ScriptPY/src/tabla_envios.json' #  Ruta al archivo JSON
+        json_file_path = self.core_dir + '/Documents/tabla_envios.json'
+        config_sql = self.config['SQLServer'] #  Obtener la sección de configuración de SQL Server
+        table_name = config_sql['table_name'] #  Nombre de la tabla desde la configuración
+
+        try:
+            # Leer datos desde JSON
+            with open(json_file_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+
+            if not data:
+                logger.warning(f"No hay datos en el archivo JSON: '{json_file_path}'.")
+                print(f"Advertencia: No hay datos en el archivo JSON: '{json_file_path}'.") #  Mensaje para la consola
+                return
+
+            conn_str = (
+                f'DRIVER={{ODBC Driver 17 for SQL Server}};' #  Asegúrate de tener el driver correcto instalado
+                f'SERVER={config_sql["server"]};'
+                f'PORT={config_sql["port"]};'
+                f'DATABASE={config_sql["database"]};'
+                f'UID={config_sql["username"]};'
+                f'PWD={config_sql["password"]}'
+            )
+            cnxn = pyodbc.connect(conn_str) # Comentado para WebContainer
+            cursor = cnxn.cursor() # Comentado para WebContainer
+
+            # Crear la tabla si no existe
+            cursor.execute(f"""
+            IF NOT EXISTS (
+                SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{table_name}'
+            )
+            CREATE TABLE {table_name} (
+                [Acciones] NVARCHAR(MAX),
+                [N° Seguimiento] NVARCHAR(50),
+                [Canal] NVARCHAR(MAX),
+                [N° Interno] NVARCHAR(50),
+                [N° Operación] NVARCHAR(50),
+                [Fecha alta] DATETIME,
+                [Fecha admisión] DATETIME,
+                [Estado envío] NVARCHAR(50),
+                [Fecha estado envío] DATETIME,
+                [Usuario] NVARCHAR(100),
+                [Centro de costos] NVARCHAR(MAX),
+                [Sector] NVARCHAR(MAX),
+                [Estado pedido] NVARCHAR(50),
+                [Servicio] NVARCHAR(MAX),
+                [Insumo] NVARCHAR(MAX),
+                [Remitente] NVARCHAR(MAX),
+                [Email remitente] NVARCHAR(100),
+                [Teléfono remitente] NVARCHAR(20),
+                [Dirección remitente] NVARCHAR(MAX),
+                [C.P. remitente] NVARCHAR(20),
+                [Localidad remitente] NVARCHAR(MAX),
+                [Provincia remitente] NVARCHAR(MAX),
+                [Origen] NVARCHAR(MAX),
+                [Destinatario] NVARCHAR(100),
+                [Email destinatario] NVARCHAR(100),
+                [Teléfono destinatario] NVARCHAR(20),
+                [Dirección destino] NVARCHAR(MAX),
+                [C.P. destino] NVARCHAR(20),
+                [Localidad destino] NVARCHAR(MAX),
+                [Provincia destino] NVARCHAR(MAX),
+                [Nombre artículo] NVARCHAR(MAX),
+                [Volumen] NVARCHAR(MAX),
+                [Peso] NVARCHAR(MAX),
+                [Valor declarado] NVARCHAR(MAX),
+                [Fecha de retiro] DATETIME,
+                [Fecha de entrega] DATETIME,
+                [Sucursal de retiro] NVARCHAR(MAX),
+                [Info. adicional] NVARCHAR(MAX),
+                [Referencia] NVARCHAR(MAX),
+                [Sistema origen] NVARCHAR(MAX),
+                [Bultos] NVARCHAR(MAX),
+                [Número de bulto] NVARCHAR(MAX),
+                [Cupón] NVARCHAR(MAX),
+                [Tarifa S/IVA] NVARCHAR(MAX),
+                [Descuento S/IVA] NVARCHAR(MAX),
+                [Seguro S/IVA] NVARCHAR(MAX),
+                [Valor de envío S/IVA] NVARCHAR(MAX),
+                [Total S/IVA] NVARCHAR(MAX),
+                [Detalles] NVARCHAR(MAX)
+            );
+            """)
+
+            # Insertar datos validando duplicados
+            for record in data:
+                unique_field = record.get("N° Seguimiento")
+                cursor.execute(f"SELECT COUNT(*) FROM {table_name} WHERE [N° Seguimiento] = ?", (unique_field,))
+                count = cursor.fetchone()[0]
+
+                if count == 0:
+                    columns = ', '.join(record.keys())
+                    placeholders = ', '.join(['?'] * len(record))
+                    insert_query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+                    cursor.execute(insert_query, tuple(record.values()))
+                else:
+                    logging.info(f"Registro duplicado detectado: {unique_field}")
+
+            cnxn.commit()
+            cnxn.close()
+
+            logging.info(f"Datos importados a la tabla '{table_name}' correctamente.")
+
+
+        except FileNotFoundError:
+            logger.error(f"Archivo JSON no encontrado: {json_file_path}")
+            print(f"Error: Archivo JSON no encontrado: {json_file_path}") #  Mensaje para la consola
+        except json.JSONDecodeError:
+            logger.error(f"Error al decodificar JSON desde el archivo: {json_file_path}")
+            print(f"Error al decodificar JSON desde el archivo: {json_file_path}") #  Mensaje para la consola
+        except Exception as e: #  Capturar otras excepciones que puedan ocurrir
+            logger.error(f"Error al importar datos a SQL Server: {e}")
+            print(f"Error al importar datos a SQL Server: {e}") #  Mensaje para la consola
+
 
 if __name__ == '__main__':
     # Ejemplo de uso (necesita un archivo config.ini de prueba)
     import configparser
     config = configparser.ConfigParser()
-    config.read('../config/config.ini') #  Ajustar la ruta si es necesario
+    config.read('config/config.ini') #  Ajustar la ruta si es necesario
 
     logging.basicConfig(level=logging.INFO)
     automator = AndreaniAutomator(config)
-
+    # automator.import_json_to_sql_server()
     try:
         automator.start_browser()
         automator.login_andreani()
@@ -289,15 +413,23 @@ if __name__ == '__main__':
         # automator.upload_excel_file(excel_template_path) # Comentar para probar solo la parte de carga masiva
         # automator.confirm_massive_upload() #  Comentar para probar solo la parte de carga masiva
         # operation_numbers = automator.extract_operation_numbers() # Comentar para probar solo la parte de carga masiva
-        operation_numbers = ['19048590'] #  Para pruebas de impresión, usar un número de operación conocido
+        operation_numbers = ['19069936'] #  Para pruebas de impresión, usar un número de operación conocido
         if operation_numbers:
             for op_num in operation_numbers:
                 automator.navigate_to_envio_management()
+                time.sleep(5)
                 automator.search_operation_number(op_num)
                 automator.print_labels_for_operation(op_num)
+                
 
     except Exception as e:
         logger.error(f"Error durante la automatización: {e}")
     finally:
         automator.close_browser()
     print("Proceso de automatización finalizado.") # print para mostrar en la consola de WebContainer
+
+    try:
+        automator.import_json_to_sql_server()
+    except Exception as e:
+        logger.error(f"Error al importar datos a SQL Server: {e}")
+    print("Proceso de importación a SQL Server finalizado.")
