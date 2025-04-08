@@ -42,13 +42,16 @@ class AndreaniAutomator:
 
     def login_andreani(self):
         """Inicia sesión en Andreani Online."""
+        time.sleep(2)
         try:
             self.browser.get(self.config['Andreani']['base_url'] + '/login')
             WebDriverWait(self.browser, 200).until(
                 EC.presence_of_element_located((By.ID, 'main'))
             )
+            time.sleep(6)
             search_button = self.browser.find_element(By.ID, 'loginButton')
             search_button.click()
+            time.sleep(3)
 
             WebDriverWait(self.browser, 200).until(
                 EC.presence_of_element_located((By.ID, 'username'))
