@@ -196,19 +196,38 @@ class AndreaniAutomator:
             logger.error(f"Error al navegar a la página de gestión de envíos: {e}")
             raise
 
+    def close_important_modal(self):
+        """Detecta y cierra el modal 'importantModal' si está presente."""
+        try:
+            # Espera hasta 5 segundos a que el botón de cierre del modal sea clickeable
+            close_button = WebDriverWait(self.browser, 5).until(
+                EC.element_to_be_clickable((By.XPATH, "//div[@id='importantModal']//button[@class='close']"))
+            )
+            close_button.click()
+            logger.info("Modal '¡Importante!' detectado y cerrado.")
+            time.sleep(4)  # Pequeña espera para que la acción de cierre se complete
+        except Exception:
+            # Si el modal no se encuentra o no es clickeable, simplemente continúa
+            logger.info("Modal '¡Importante!' no fue detectado.")
+            pass
+
     def search_operation_number(self, operation_number):
         """Busca un número de operación en la página de gestión de envíos."""
+        self.close_important_modal()  # Llama a la nueva función para cerrar el modal si existe
         try:
             WebDriverWait(self.browser, 200).until(
                 EC.presence_of_element_located((By.ID, 'filtroGeneral'))
             )
             search_textinput = self.browser.find_element(By.ID, 'filtroGeneral')
+            search_textinput.clear()  # Limpia el campo antes de escribir
             search_textinput.send_keys(operation_number)
             time.sleep(5)
             # Presiona el boton Buscar
-            search_textinput = self.browser.find_element(By.XPATH,'//*[@id="historial"]/div/div/div/form/div[1]/div[1]/button[1]')
+            search_textinput = self.browser.find_element(By.XPATH,'//*[@id="buscarBoton"]')
             search_textinput.click()
             time.sleep(10)
+            """Detecta y cierra el modal 'importantModal' si está presente."""
+            self.close_important_modal()
             # Mostrar 100 registros (opcional, si es necesario asegurar que se muestren todos los resultados)
             search_button = self.browser.find_element(By.ID, 'j-cantidad').click()
             search_button = self.browser.find_element(By.XPATH, '//*[@id="j-cantidad"]/option[4]').click()
@@ -220,6 +239,8 @@ class AndreaniAutomator:
             raise
 
     def print_labels_for_operation(self, operation_number):
+        """Detecta y cierra el modal 'importantModal' si está presente."""
+        self.close_important_modal()
         path_docJson = self.core_dir + '/Documents/tabla_envios.json'
         try:
             # Web scraping para extraer datos de la tabla e imprimir en JSON
@@ -416,7 +437,7 @@ if __name__ == '__main__':
         # automator.upload_excel_file(excel_template_path) # Comentar para probar solo la parte de carga masiva
         # automator.confirm_massive_upload() #  Comentar para probar solo la parte de carga masiva
         # operation_numbers = automator.extract_operation_numbers() # Comentar para probar solo la parte de carga masiva
-        operation_numbers = ['19069936'] #  Para pruebas de impresión, usar un número de operación conocido
+        operation_numbers = ['19895940'] #  Para pruebas de impresión, usar un número de operación conocido
         if operation_numbers:
             for op_num in operation_numbers:
                 automator.navigate_to_envio_management()
